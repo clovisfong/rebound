@@ -1,0 +1,37 @@
+#game-display {
+  width: 680px;
+  height: 400px;
+  background-color: antiquewhite;
+  position: absolute;
+
+}
+
+
+.block {
+  width: 100px;
+  height: 20px;
+  background-color: teal;
+  position: absolute;
+}
+
+#user {
+  width: 100px;
+  height: 20px;
+  background-color: gold;
+
+}
+
+.player {
+  width: 100px;
+  height: 20px;
+  background-color: blueviolet;
+  position: absolute;
+}
+
+.ball {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: lightcoral;
+  position: absolute;
+}
