@@ -4,7 +4,10 @@ import $ from "jquery";
 
 const app = {
   gameDisplay: [{ width: 680, height: 400 }],
+  blockCount: 18,
+  blockStartPos: [{ xAxis: 10, yAxis: 10 }],
   blockDimension: [{ width: 100, height: 20 }],
+  blockGap: [{ side: 10, bottom: 10 }],
 
   barCurrentPos: [{ xAxis: 285, yAxis: 370 }],
   barSpeed: [{ leftSpeed: 30, rightSpeed: 30 }],
@@ -17,9 +20,10 @@ const app = {
     yDirection: -1
   },
 
-  scoreTracker: 0
-}
+  scoreTracker: 0,
 
+  numSwitch: true
+}
 
 
 class Block {
@@ -32,29 +36,27 @@ class Block {
   }
 }
 
+// i * app.blockDimension[0].width + i * app.blockGap[0].side
+
+const blocks = []
+let xAddon = 0
+let yAddon = 0
+
+for (let i = 0; i < app.blockCount; i++) {
+  const block = new Block(app.blockStartPos[0].xAxis + xAddon, app.blockStartPos[0].yAxis + yAddon)
+  console.log(app.blockStartPos[0].xAxis + xAddon)
+  console.log(app.blockStartPos[0].yAxis + yAddon)
+  xAddon += (app.blockDimension[0].width + app.blockGap[0].side)
+  if ((app.blockStartPos[0].xAxis + app.blockDimension[0].width + xAddon) > app.gameDisplay[0].width) {
+    xAddon = 0
+    yAddon += 30
+  }
+  blocks.push(block)
+}
 
 
 // Create aXis for blocks
-const blocks = [
-  new Block(10, 10),
-  new Block(120, 10),
-  new Block(230, 10),
-  new Block(340, 10),
-  new Block(450, 10),
-  new Block(560, 10),
-  new Block(10, 40),
-  new Block(120, 40),
-  new Block(230, 40),
-  new Block(340, 40),
-  new Block(450, 40),
-  new Block(560, 40),
-  new Block(10, 70),
-  new Block(120, 70),
-  new Block(230, 70),
-  new Block(340, 70),
-  new Block(450, 70),
-  new Block(560, 70),
-]
+
 
 
 
@@ -63,6 +65,8 @@ const blue = Math.floor(Math.random() * 256)
 const green = Math.floor(Math.random() * 256)
 const colorcode = `rgb(${red}, ${blue}, ${green})`
 
+// const randNum = Math.floor(Math.random() * 10)
+// console.log(randNum)
 
 
 const drawBlocks = () => {
@@ -79,6 +83,9 @@ const drawBlocks = () => {
     $('#game-display').append($block)
   }
 }
+
+
+
 
 const testball = new Block(100, 400)
 
@@ -156,7 +163,6 @@ const hitBarBounceRight = () => {
 }
 
 const removeBlocksAndUpdateScore = (item) => {
-  console.log("remove " + item)
   blocks.splice(item, 1)
   app.scoreTracker++
 }
@@ -170,19 +176,6 @@ const bounceOffBlocks = () => {
       (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) < blocks[i].btmRight[0] &&
       (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) > blocks[i].topLeft[1] &&
       (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) < blocks[i].btmRight[1]
-
-
-
-      //   app.ballCurrentPos[0].xAxis < blocks[i].btmRight[0]) &&
-      // app.ballCurrentPos[0].yAxis > blocks[i].btmLeft[1] &&
-      // (app.ballCurrentPos[0].yAxis + app.ballDiameter[0]) < blocks[i].topLeft[0]
-
-
-      // app.ballCurrentPos[0].xAxis > blocks[i].btmLeft[0] &&
-      // app.ballCurrentPos[0].xAxis < blocks[i].btmRight[0] &&
-      // app.ballCurrentPos[0].yAxis > blocks[i].topLeft[0].yAxis &&
-      // app.ballCurrentPos[0].yAxis < blocks[i].btmLeft[0].yAxis
-
     ) {
       removeBlocksAndUpdateScore(i)
       changeDirection()
@@ -190,7 +183,7 @@ const bounceOffBlocks = () => {
   }
 }
 
-console.log()
+
 
 const gameOver = () => {
 
@@ -209,7 +202,7 @@ const ballTouch = () => {
 
 }
 
-// let time = 0;
+
 
 const moveBall = () => {
   app.ballCurrentPos[0].xAxis += app.ballDirection.xDirection
@@ -219,18 +212,14 @@ const moveBall = () => {
   render()
 }
 
+
+
 const ballTimer = setInterval(moveBall, 5)
-
-
 
 
 const render = () => {
   $('#game-display').empty()
   $('#score').remove()
-  // time++;
-  // if (time === 1000) {
-  //   clearInterval(ballTimer)
-  // }
   drawBlocks()
   drawUserBar()
   drawBall()
