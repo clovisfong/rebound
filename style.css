@@ -8,9 +8,6 @@
 
 
 .block {
-  width: 100px;
-  height: 20px;
-  background-color: teal;
   position: absolute;
 }
 

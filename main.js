@@ -58,16 +58,29 @@ const blocks = [
 
 
 
+const red = Math.floor(Math.random() * 256)
+const blue = Math.floor(Math.random() * 256)
+const green = Math.floor(Math.random() * 256)
+const colorcode = `rgb(${red}, ${blue}, ${green})`
+
 
 
 const drawBlocks = () => {
 
   for (const block of blocks) {
     const $block = $('<div>').addClass('block')
-    $block.css({ left: block.topLeft[0] + 'px', top: block.topLeft[1] + 'px' })
+    $block.css({
+      width: app.blockDimension[0].width + 'px',
+      height: app.blockDimension[0].height + 'px',
+      left: block.topLeft[0] + 'px',
+      top: block.topLeft[1] + 'px'
+    })
+    $block.css('background-color', colorcode)
     $('#game-display').append($block)
   }
 }
+
+const testball = new Block(100, 400)
 
 
 const drawUserBar = () => {
@@ -76,6 +89,8 @@ const drawUserBar = () => {
   $user.css({ left: app.barCurrentPos[0].xAxis + 'px', top: app.barCurrentPos[0].yAxis + 'px' })
   $('#game-display').append($user)
 }
+
+
 
 
 const drawBall = () => {
@@ -146,21 +161,36 @@ const removeBlocksAndUpdateScore = (item) => {
   app.scoreTracker++
 }
 
+console.log(app.ballDiameter[0] / 2)
 
 const bounceOffBlocks = () => {
   for (let i = 0; i < blocks.length; i++) {
-    console.log(blocks.map(x => `${x.btmLeft} - ${x.topRight}`))
-    console.log(app.ballCurrentPos[0])
-    if (app.ballCurrentPos[0].xAxis > blocks[i].btmLeft[0] &&
-      app.ballCurrentPos[0].xAxis < blocks[i].btmRight[0] &&
-      app.ballCurrentPos[0].yAxis < blocks[i].btmLeft[1] &&
-      (app.ballCurrentPos[0].yAxis + app.ballDiameter[0]) > blocks[i].topLeft[0]
+    if (
+      (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) > blocks[i].btmLeft[0] &&
+      (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) < blocks[i].btmRight[0] &&
+      (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) > blocks[i].topLeft[1] &&
+      (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) < blocks[i].btmRight[1]
+
+
+
+      //   app.ballCurrentPos[0].xAxis < blocks[i].btmRight[0]) &&
+      // app.ballCurrentPos[0].yAxis > blocks[i].btmLeft[1] &&
+      // (app.ballCurrentPos[0].yAxis + app.ballDiameter[0]) < blocks[i].topLeft[0]
+
+
+      // app.ballCurrentPos[0].xAxis > blocks[i].btmLeft[0] &&
+      // app.ballCurrentPos[0].xAxis < blocks[i].btmRight[0] &&
+      // app.ballCurrentPos[0].yAxis > blocks[i].topLeft[0].yAxis &&
+      // app.ballCurrentPos[0].yAxis < blocks[i].btmLeft[0].yAxis
+
     ) {
       removeBlocksAndUpdateScore(i)
       changeDirection()
     }
   }
 }
+
+console.log()
 
 const gameOver = () => {
 
@@ -179,25 +209,28 @@ const ballTouch = () => {
 
 }
 
-
+// let time = 0;
 
 const moveBall = () => {
   app.ballCurrentPos[0].xAxis += app.ballDirection.xDirection
   app.ballCurrentPos[0].yAxis += app.ballDirection.yDirection
-  console.log(1)
+
   ballTouch()
-
   render()
-
 }
 
-
 const ballTimer = setInterval(moveBall, 5)
+
+
 
 
 const render = () => {
   $('#game-display').empty()
   $('#score').remove()
+  // time++;
+  // if (time === 1000) {
+  //   clearInterval(ballTimer)
+  // }
   drawBlocks()
   drawUserBar()
   drawBall()
