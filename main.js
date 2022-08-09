@@ -4,10 +4,12 @@ import $ from "jquery";
 
 const app = {
   gameDisplay: [{ width: 680, height: 400 }],
+
   blockCount: 18,
   blockStartPos: [{ xAxis: 10, yAxis: 10 }],
   blockDimension: [{ width: 100, height: 20 }],
   blockGap: [{ side: 10, bottom: 10 }],
+  blocks: [],
 
   barCurrentPos: [{ xAxis: 285, yAxis: 370 }],
   barSpeed: [{ leftSpeed: 30, rightSpeed: 30 }],
@@ -22,7 +24,9 @@ const app = {
 
   scoreTracker: 0,
 
-  numSwitch: true
+  timer: { milliseconds: 0, seconds: 0, minute: 0 },
+  timeConvert: { milliseconds: 0, seconds: 0, minute: 0 }
+
 }
 
 
@@ -36,26 +40,19 @@ class Block {
   }
 }
 
-// i * app.blockDimension[0].width + i * app.blockGap[0].side
 
-const blocks = []
 let xAddon = 0
 let yAddon = 0
 
 for (let i = 0; i < app.blockCount; i++) {
   const block = new Block(app.blockStartPos[0].xAxis + xAddon, app.blockStartPos[0].yAxis + yAddon)
-  console.log(app.blockStartPos[0].xAxis + xAddon)
-  console.log(app.blockStartPos[0].yAxis + yAddon)
   xAddon += (app.blockDimension[0].width + app.blockGap[0].side)
   if ((app.blockStartPos[0].xAxis + app.blockDimension[0].width + xAddon) > app.gameDisplay[0].width) {
     xAddon = 0
     yAddon += 30
   }
-  blocks.push(block)
+  app.blocks.push(block)
 }
-
-
-// Create aXis for blocks
 
 
 
@@ -65,13 +62,11 @@ const blue = Math.floor(Math.random() * 256)
 const green = Math.floor(Math.random() * 256)
 const colorcode = `rgb(${red}, ${blue}, ${green})`
 
-// const randNum = Math.floor(Math.random() * 10)
-// console.log(randNum)
 
 
 const drawBlocks = () => {
 
-  for (const block of blocks) {
+  for (const block of app.blocks) {
     const $block = $('<div>').addClass('block')
     $block.css({
       width: app.blockDimension[0].width + 'px',
@@ -87,7 +82,7 @@ const drawBlocks = () => {
 
 
 
-const testball = new Block(100, 400)
+// const testball = new Block(100, 400)
 
 
 const drawUserBar = () => {
@@ -96,8 +91,6 @@ const drawUserBar = () => {
   $user.css({ left: app.barCurrentPos[0].xAxis + 'px', top: app.barCurrentPos[0].yAxis + 'px' })
   $('#game-display').append($user)
 }
-
-
 
 
 const drawBall = () => {
@@ -163,19 +156,18 @@ const hitBarBounceRight = () => {
 }
 
 const removeBlocksAndUpdateScore = (item) => {
-  blocks.splice(item, 1)
+  app.blocks.splice(item, 1)
   app.scoreTracker++
 }
 
-console.log(app.ballDiameter[0] / 2)
 
 const bounceOffBlocks = () => {
-  for (let i = 0; i < blocks.length; i++) {
+  for (let i = 0; i < app.blocks.length; i++) {
     if (
-      (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) > blocks[i].btmLeft[0] &&
-      (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) < blocks[i].btmRight[0] &&
-      (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) > blocks[i].topLeft[1] &&
-      (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) < blocks[i].btmRight[1]
+      (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) > app.blocks[i].btmLeft[0] &&
+      (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) < app.blocks[i].btmRight[0] &&
+      (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) > app.blocks[i].topLeft[1] &&
+      (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) < app.blocks[i].btmRight[1]
     ) {
       removeBlocksAndUpdateScore(i)
       changeDirection()
@@ -189,6 +181,7 @@ const gameOver = () => {
 
   if (app.ballCurrentPos[0].yAxis + app.ballDiameter[0] > app.gameDisplay[0].height) {
     clearInterval(ballTimer)
+    clearInterval(stopClock)
     app.scoreTracker = "Game Over"
   }
 }
@@ -199,6 +192,8 @@ const ballTouch = () => {
   hitBarBounceRight()
   bounceOffBlocks()
   gameOver()
+
+
 
 }
 
@@ -213,7 +208,67 @@ const moveBall = () => {
 }
 
 
+///// STOPCLOCK
 
+const convertSeconds = () => {
+  if (app.timer.seconds < 10) {
+    app.timeConvert.secondsTimer = '0' + app.timer.seconds
+  } else {
+    app.timeConvert.secondsTimer = app.timer.seconds
+  }
+}
+
+const convertMinute = () => {
+  if (app.timer.minute < 10) {
+    app.timeConvert.minute = '0' + app.timer.minute
+  } else {
+    app.timeConvert.minute = app.timer.minute
+  }
+}
+
+const convertMilliseconds = () => {
+  if (app.timer.milliseconds >= 100) {
+    app.timeConvert.milliseconds = app.timer.milliseconds / 10
+  } else {
+    app.timeConvert.milliseconds = app.timer.milliseconds
+  }
+}
+const convertTime = () => {
+  convertMilliseconds()
+  convertSeconds()
+  convertMinute()
+
+}
+
+const displayTimer = () => {
+  convertTime()
+  const $milliseconds = $('<h3>').text(`${app.timeConvert.minute} : ${app.timeConvert.secondsTimer} : ${app.timeConvert.milliseconds}`).addClass('timer')
+  $milliseconds.insertAfter('#score-display')
+
+}
+
+
+const countTime = () => {
+  app.timer.milliseconds += 10
+  if (app.timer.milliseconds === 1000) {
+    app.timer.seconds++
+    app.timer.milliseconds = 0
+  }
+  if (app.timer.seconds === 60) {
+    app.timer.minute++
+    app.timer.seconds = 0
+  }
+  if (app.timer.minute === 60) {
+    clearInterval(stopClock)
+  }
+}
+
+const runTime = () => {
+  countTime()
+  render()
+}
+
+const stopClock = setInterval(runTime, 10)
 const ballTimer = setInterval(moveBall, 5)
 
 
@@ -224,6 +279,11 @@ const render = () => {
   drawUserBar()
   drawBall()
   drawScore()
+
+  $('.timer').remove()
+  displayTimer()
+
+
 }
 
 
@@ -269,7 +329,9 @@ const main = () => {
 }
 
 
-
-
 main()
+
+
+
+
 
