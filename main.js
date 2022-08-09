@@ -34,8 +34,7 @@ const app = {
 
 
 
-
-///Set bar and ball positions dynamically to game display
+/// CREATE BAR AND BALL COORDINATES IN RELATION TO GAME DISPLAY
 
 const barStartXPosition = () => {
   const widthDifferenceOfBarAndDisplay = app.gameDisplay[0].width - app.barDimensions[0].width
@@ -48,7 +47,6 @@ const barStartYPosition = () => {
   const barYAxisCoordinate = heightDifferenceOfBarAndDisplay - app.blockStartPos[0].yAxis
   app.barCurrentPos[0].yAxis = barYAxisCoordinate
 }
-
 
 const ballStartXPosition = () => {
   const gameDisplayMidpoint = app.gameDisplay[0].width / 2
@@ -72,7 +70,7 @@ const setBarAndBallCoordinates = () => {
 
 
 
-
+/// CREATE GAME DISPLAY
 const setGameDisplay = () => {
 
   $('#game-display').css({
@@ -84,6 +82,7 @@ const setGameDisplay = () => {
 
 
 
+/// GENERATE BLOCKS DATA DYNAMICALLY
 
 class Block {
   constructor(xAxis, yAxis) {
@@ -96,13 +95,13 @@ class Block {
 }
 
 
-///// GENERATE BLOCKS DYNAMICALLY
-
-
 const createBlockInstances = () => {
-
+  // create data coordinates for all the blocks and store in app
   for (let i = 0; i < app.blockCount; i++) {
-    const block = new Block(app.blockStartPos[0].xAxis + app.nextBlockPosition.xAxis, app.blockStartPos[0].yAxis + app.nextBlockPosition.yAxis)
+    const block = new Block(
+      app.blockStartPos[0].xAxis + app.nextBlockPosition.xAxis,
+      app.blockStartPos[0].yAxis + app.nextBlockPosition.yAxis)
+
     app.nextBlockPosition.xAxis += (app.blockDimension[0].width + app.blockGap[0].side)
     if ((app.blockStartPos[0].xAxis + app.blockDimension[0].width + app.nextBlockPosition.xAxis) > app.gameDisplay[0].width) {
       app.nextBlockPosition.xAxis = 0
@@ -115,15 +114,16 @@ const createBlockInstances = () => {
 
 
 
+/// DRAW BLOCKS, BAR, BALL AND SCORE
+
 const red = Math.floor(Math.random() * 256)
 const blue = Math.floor(Math.random() * 256)
 const green = Math.floor(Math.random() * 256)
 const colorcode = `rgb(${red}, ${blue}, ${green})`
 
 
-
 const drawBlocks = () => {
-
+  //take block coordinates from app and display
   for (const block of app.blocks) {
     const $block = $('<div>').addClass('block')
     $block.css({
@@ -136,11 +136,6 @@ const drawBlocks = () => {
     $('#game-display').append($block)
   }
 }
-
-
-
-
-// const testball = new Block(100, 400)
 
 
 const drawUserBar = () => {
@@ -168,6 +163,7 @@ const drawBall = () => {
   $('#game-display').append($ball)
 }
 
+
 const drawScore = () => {
   const $score = $('<span>').text(app.scoreTracker).attr('id', 'score')
   $('#score-display').append($score)
@@ -175,7 +171,7 @@ const drawScore = () => {
 
 
 
-
+/// BALL MOVEMENT
 
 const changeDirection = () => {
 
@@ -223,11 +219,11 @@ const hitBarBounceRight = () => {
   }
 }
 
+
 const removeBlocksAndUpdateScore = (item) => {
   app.blocks.splice(item, 1)
   app.scoreTracker++
 }
-
 
 const bounceOffBlocks = () => {
   for (let i = 0; i < app.blocks.length; i++) {
@@ -244,27 +240,25 @@ const bounceOffBlocks = () => {
 }
 
 
-
-const gameOver = () => {
+const ballGameOver = () => {
 
   if (app.ballCurrentPos[0].yAxis + app.ballDiameter[0] > app.gameDisplay[0].height) {
     clearInterval(ballTimer)
     clearInterval(stopClock)
     app.scoreTracker = "Game Over"
   }
+
+  ///////////////
 }
+
 
 const ballTouch = () => {
   bounceOffWalls()
   hitBarBounceLeft()
   hitBarBounceRight()
   bounceOffBlocks()
-  gameOver()
-
-
-
+  ballGameOver()
 }
-
 
 
 const moveBall = () => {
@@ -276,7 +270,18 @@ const moveBall = () => {
 }
 
 
-///// STOPCLOCK
+///// STOP CLOCK
+
+const convertMilliseconds = () => {
+  if (app.timer.milliseconds >= 100) {
+    app.timeConvert.milliseconds = app.timer.milliseconds / 10
+  } else {
+    app.timeConvert.milliseconds = app.timer.milliseconds
+  }
+  if (app.timer.milliseconds === 0) {
+    app.timeConvert.milliseconds = '0' + '0'
+  }
+}
 
 const convertSeconds = () => {
   if (app.timer.seconds < 10) {
@@ -294,13 +299,7 @@ const convertMinute = () => {
   }
 }
 
-const convertMilliseconds = () => {
-  if (app.timer.milliseconds >= 100) {
-    app.timeConvert.milliseconds = app.timer.milliseconds / 10
-  } else {
-    app.timeConvert.milliseconds = app.timer.milliseconds
-  }
-}
+
 const convertTime = () => {
   convertMilliseconds()
   convertSeconds()
@@ -315,12 +314,53 @@ const displayTimer = () => {
 
 }
 
+const shiftCurrentBlocksDown = () => {
+  // Go to app directly to update coodinates for the old blocks
+  app.blocks.forEach((block) => {
+    block.topLeft[1] += 30;
+    block.topRight[1] += 30;
+    block.btmLeft[1] += 30;
+    block.btmRight[1] += 30;
+  })
+}
+
+const createNewRows = () => {
+  app.nextBlockPosition.xAxis = 0
+  app.nextBlockPosition.yAxis = 0
+  for (let i = 0; i < Math.floor(app.gameDisplay[0].width / (app.blockDimension[0].width + app.blockGap[0].side)); i++) {
+
+    const newblock = new Block(
+      app.blockStartPos[0].xAxis + app.nextBlockPosition.xAxis,
+      app.blockStartPos[0].yAxis + app.nextBlockPosition.yAxis)
+
+    app.nextBlockPosition.xAxis += (app.blockDimension[0].width + app.blockGap[0].side)
+    if ((app.blockStartPos[0].xAxis + app.blockDimension[0].width + app.nextBlockPosition.xAxis) > app.gameDisplay[0].width) {
+      app.nextBlockPosition.xAxis = 0
+      app.nextBlockPosition.yAxis += 30
+    }
+    app.blocks.push(newblock)
+  }
+}
+
+const blocksGameOver = () => {
+  if (app.blocks.some((block) => block.btmLeft[1] > app.barCurrentPos[0].yAxis - app.ballDiameter[0])) {
+    clearInterval(stopClock)
+    clearInterval(ballTimer)
+  }
+}
 
 const countTime = () => {
   app.timer.milliseconds += 10
   if (app.timer.milliseconds === 1000) {
     app.timer.seconds++
     app.timer.milliseconds = 0
+    // Put shift blocks condition here because condition is reviewed every 1 sec
+    if (app.timer.seconds % 30 === 0) {
+      shiftCurrentBlocksDown()
+      createNewRows()
+      blocksGameOver()
+      render()
+    }
   }
   if (app.timer.seconds === 60) {
     app.timer.minute++
@@ -330,6 +370,7 @@ const countTime = () => {
     clearInterval(stopClock)
   }
 }
+
 
 const runTime = () => {
   countTime()
@@ -351,12 +392,12 @@ const render = () => {
   $('.timer').remove()
   displayTimer()
 
-
 }
 
 
 
 
+/// MOVE USER BAR
 
 const moveBarLeft = () => {
   if (app.barCurrentPos[0].xAxis >= app.barSpeed[0].leftSpeed) {
@@ -368,7 +409,6 @@ const moveBarLeft = () => {
 
 }
 
-
 const moveBarRight = () => {
   if (app.barCurrentPos[0].xAxis + app.barDimensions[0].width + app.barSpeed[0].rightSpeed <= app.gameDisplay[0].width) {
     app.barCurrentPos[0].xAxis += app.barSpeed[0].rightSpeed
@@ -379,7 +419,6 @@ const moveBarRight = () => {
   }
 }
 
-console.log(app.gameDisplay[0].width)
 const moveUserBar = (e) => {
 
   switch (e.which) {
@@ -396,6 +435,9 @@ const moveUserBar = (e) => {
 
 
 
+
+/// MAIN SWTICH 
+
 const main = () => {
   setBarAndBallCoordinates()
   setGameDisplay()
@@ -408,7 +450,6 @@ const main = () => {
 
 
 main()
-
 
 
 
