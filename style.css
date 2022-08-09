@@ -1,6 +1,4 @@
 #game-display {
-  width: 680px;
-  height: 400px;
   background-color: antiquewhite;
   position: absolute;
 
@@ -25,8 +23,7 @@
 }
 
 .ball {
-  width: 30px;
-  height: 30px;
+
   border-radius: 50%;
   background-color: lightcoral;
   position: absolute;
