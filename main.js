@@ -11,9 +11,9 @@ const app = {
   blockGap: [{ side: 10, bottom: 10 }],
   blocks: [],
 
-  barCurrentPos: [{ xAxis: 285, yAxis: 370 }],
   barSpeed: [{ leftSpeed: 30, rightSpeed: 30 }],
-  barDimensions: [{ width: 100, height: 20 }],
+  barDimensions: [{ width: 150, height: 20 }],
+  barCurrentPos: [{ xAxis: 0, yAxis: 0 }],
 
   ballCurrentPos: [{ xAxis: 320, yAxis: 340 }],
   ballDiameter: [30],
@@ -27,6 +27,23 @@ const app = {
   timer: { milliseconds: 0, seconds: 0, minute: 0 },
   timeConvert: { milliseconds: 0, seconds: 0, minute: 0 }
 
+}
+
+const barStartXPosition = () => {
+  const widthDifferenceOfBarAndDisplay = app.gameDisplay[0].width - app.barDimensions[0].width
+  const barXAxisCoordinate = widthDifferenceOfBarAndDisplay / 2
+  app.barCurrentPos[0].xAxis = barXAxisCoordinate
+}
+
+const barStartYPosition = () => {
+  const heightDifferenceOfBarAndDisplay = app.gameDisplay[0].height - app.barDimensions[0].height
+  const barYAxisCoordinate = heightDifferenceOfBarAndDisplay - app.blockStartPos[0].yAxis
+  app.barCurrentPos[0].yAxis = barYAxisCoordinate
+}
+
+const setBarLocation = () => {
+  barStartXPosition()
+  barStartYPosition()
 }
 
 
@@ -88,7 +105,12 @@ const drawBlocks = () => {
 const drawUserBar = () => {
 
   const $user = $('<div>').addClass('player')
-  $user.css({ left: app.barCurrentPos[0].xAxis + 'px', top: app.barCurrentPos[0].yAxis + 'px' })
+  $user.css({
+    width: app.barDimensions[0].width + 'px',
+    height: app.barDimensions[0].height + 'px',
+    left: app.barCurrentPos[0].xAxis + 'px',
+    top: app.barCurrentPos[0].yAxis + 'px'
+  })
   $('#game-display').append($user)
 }
 
@@ -321,7 +343,7 @@ const moveUserBar = (e) => {
 
 
 const main = () => {
-
+  setBarLocation()
   $('body').on('keydown', moveUserBar)
 
   render()
