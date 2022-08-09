@@ -15,7 +15,7 @@ const app = {
   barDimensions: [{ width: 150, height: 20 }],
   barCurrentPos: [{ xAxis: 0, yAxis: 0 }],
 
-  ballCurrentPos: [{ xAxis: 320, yAxis: 340 }],
+  ballCurrentPos: [{ xAxis: 0, yAxis: 0 }],
   ballDiameter: [30],
   ballDirection: {
     xDirection: 1,
@@ -41,10 +41,26 @@ const barStartYPosition = () => {
   app.barCurrentPos[0].yAxis = barYAxisCoordinate
 }
 
-const setBarLocation = () => {
+
+const ballStartXPosition = () => {
+  const gameDisplayMidpoint = app.gameDisplay[0].width / 2
+  const ballXAxisCoordinate = gameDisplayMidpoint - app.ballDiameter / 2
+  app.ballCurrentPos[0].xAxis = ballXAxisCoordinate
+}
+
+const ballStartYPosition = () => {
+  const ballYAxisCoordinate = app.barCurrentPos[0].yAxis - app.ballDiameter
+  app.ballCurrentPos[0].yAxis = ballYAxisCoordinate
+}
+
+const setBarAndBallLocation = () => {
   barStartXPosition()
   barStartYPosition()
+
+  ballStartXPosition()
+  ballStartYPosition()
 }
+
 
 
 class Block {
@@ -58,6 +74,7 @@ class Block {
 }
 
 
+///// GENERATE BLOCKS DYNAMICALLY
 let xAddon = 0
 let yAddon = 0
 
@@ -343,7 +360,7 @@ const moveUserBar = (e) => {
 
 
 const main = () => {
-  setBarLocation()
+  setBarAndBallLocation()
   $('body').on('keydown', moveUserBar)
 
   render()
