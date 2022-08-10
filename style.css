@@ -1,3 +1,10 @@
+/* #game {
+  width: 1000px;
+  height: 500px;
+  background-color: aquamarine;
+  margin: 0 auto;
+} */
+
 #game-display {
   background-color: antiquewhite;
   position: absolute;

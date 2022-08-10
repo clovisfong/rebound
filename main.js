@@ -26,8 +26,9 @@ const app = {
 
   scoreTracker: 0,
 
-  timer: { milliseconds: 0, seconds: 0, minute: 0 },
-  timeConvert: { milliseconds: 0, seconds: 0, minute: 0 }
+  timer: { milliseconds: 0, seconds: 0, minute: 2 },
+  timeConvert: { milliseconds: 0, seconds: 0, minute: 0 },
+  timeSwitch: true
 
 }
 
@@ -272,14 +273,15 @@ const moveBall = () => {
 
 ///// STOP CLOCK
 
+// CONVERT TIME
 const convertMilliseconds = () => {
   if (app.timer.milliseconds >= 100) {
     app.timeConvert.milliseconds = app.timer.milliseconds / 10
   } else {
     app.timeConvert.milliseconds = app.timer.milliseconds
   }
-  if (app.timer.milliseconds === 0) {
-    app.timeConvert.milliseconds = '0' + '0'
+  if (app.timer.milliseconds === 1000 || app.timer.milliseconds === 0) {
+    app.timeConvert.milliseconds = '00'
   }
 }
 
@@ -288,6 +290,9 @@ const convertSeconds = () => {
     app.timeConvert.secondsTimer = '0' + app.timer.seconds
   } else {
     app.timeConvert.secondsTimer = app.timer.seconds
+  }
+  if (app.timer.seconds === 60) {
+    app.timeConvert.secondsTimer = '00'
   }
 }
 
@@ -307,12 +312,22 @@ const convertTime = () => {
 
 }
 
+
+// DISPLAY TIME
 const displayTimer = () => {
   convertTime()
   const $milliseconds = $('<h3>').text(`${app.timeConvert.minute} : ${app.timeConvert.secondsTimer} : ${app.timeConvert.milliseconds}`).addClass('timer')
   $milliseconds.insertAfter('#score-display')
-
 }
+
+// 
+const stopTimerOnceZero = () => {
+  if (app.timer.minute === 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) {
+    clearInterval(stopClock)
+    clearInterval(moveBall)
+  }
+}
+
 
 const shiftCurrentBlocksDown = () => {
   // Go to app directly to update coodinates for the old blocks
@@ -349,36 +364,50 @@ const blocksGameOver = () => {
   }
 }
 
-const countTime = () => {
-  app.timer.milliseconds += 10
-  if (app.timer.milliseconds === 1000) {
-    app.timer.seconds++
-    app.timer.milliseconds = 0
+const shrinkBar = () => {
+  if (app.barDimensions[0].width > 50) {
+    app.barDimensions[0].width -= 2
+  }
+}
+
+const countDownTime = () => {
+  stopTimerOnceZero()
+
+  if (app.timer.minute > 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) {
+    app.timer.minute--
+    app.timer.seconds = 60
+  }
+
+  if (app.timer.seconds > 0 && app.timer.milliseconds === 0) {
+    app.timer.seconds--
+    app.timer.milliseconds = 1000
     // Put shift blocks condition here because condition is reviewed every 1 sec
-    if (app.timer.seconds % 30 === 0) {
+    if (app.timer.seconds % 15 === 0) {
       shiftCurrentBlocksDown()
       createNewRows()
       blocksGameOver()
       render()
     }
+    if (app.timer.seconds % 2 === 0) {
+      shrinkBar()
+    }
+
   }
-  if (app.timer.seconds === 60) {
-    app.timer.minute++
-    app.timer.seconds = 0
+  if (app.timer.milliseconds > 0) { // important condition to determine the start and stop of timer
+    app.timer.milliseconds -= 10
   }
-  if (app.timer.minute === 60) {
-    clearInterval(stopClock)
-  }
+
 }
 
 
 const runTime = () => {
-  countTime()
+  countDownTime()
   render()
 }
 
 const stopClock = setInterval(runTime, 10)
 const ballTimer = setInterval(moveBall, 5)
+
 
 
 const render = () => {
@@ -454,3 +483,63 @@ main()
 
 
 
+// const countTime = () => {
+//   app.timer.milliseconds += 10
+//   if (app.timer.milliseconds === 1000) {
+//     app.timer.seconds++
+//     app.timer.milliseconds = 0
+//     // Put shift blocks condition here because condition is reviewed every 1 sec
+//     if (app.timer.seconds % 30 === 0) {
+//       shiftCurrentBlocksDown()
+//       createNewRows()
+//       blocksGameOver()
+//       render()
+//     }
+//   }
+//   if (app.timer.seconds === 60) {
+//     app.timer.minute++
+//     app.timer.seconds = 0
+//   }
+//   if (app.timer.minute === 60) {
+//     clearInterval(stopClock)
+//   }
+// }
+
+
+// const checkStartTime = () => {
+//   if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds >= 0 && app.timer.milliseconds >= 10) { //2.15.120 min or  2.00.990
+//     app.timeSwitch = false
+//   }
+
+//   if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.milliseconds === 0) {
+//     if (app.timer.seconds > 0) { // 2.15.00 min
+//       app.timer.seconds--
+//     }
+//     if (app.timer.seconds === 0) { // 2.00.00 min
+//       app.timer.minute--
+//       app.timer.seconds += 59
+//     }
+//     app.timer.milliseconds += 1000
+//     app.timeSwitch = false
+//   }
+
+//   if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds > 0 && app.timer.milliseconds === 0) { // 2.15.00 min
+//     app.timer.seconds--
+//     app.timer.milliseconds += 1000
+//     app.timeSwitch = false
+//   }
+//   if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) { // 2.00.00 min
+//     app.timer.minute--
+//     app.timer.seconds += 59
+//     app.timer.milliseconds += 1000
+//     app.timeSwitch = false
+//   }
+//   if (app.timeSwitch === true && app.timer.minute === 0 && app.timer.seconds > 0 && app.timer.milliseconds >= 10) { // 0.45.450
+//     app.timeSwitch = false
+//   }
+//   if (app.timeSwitch === true && app.timer.minute === 0 && app.timer.seconds > 0 && app.timer.milliseconds === 0) {// 0.45.0
+//     app.timer.seconds--
+//     app.timer.milliseconds += 1000
+//     app.timeSwitch = false
+//   }
+// }
