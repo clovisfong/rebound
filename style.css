@@ -1,37 +1,228 @@
-/* #game {
-  width: 1000px;
-  height: 500px;
-  background-color: aquamarine;
-  margin: 0 auto;
-} */
+@font-face {
+  font-family: coolvetica;
+  src: url(font/coolvetica/coolvetica\ rg.otf);
+}
 
-#game-display {
-  background-color: antiquewhite;
-  position: absolute;
+
+body {
+  font-family: coolvetica;
+  color: #294c74;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: 100px;
+}
+
+.artboard {
+  width: 800px;
+  height: 600px;
+  background-color: #fffbf0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto
+}
+
+
+
+
+
+
+#scoring-board {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px 0 30px;
+  height: 0px;
+}
+
+.logo-small {
+  width: 150px;
+  height: 50px;
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+  height: 80px
+}
+
+.score-title {
+  letter-spacing: 3px;
+  font-size: 25px;
+  margin-right: 10px;
 
 }
 
+.score {
+  background-color: #E7E1DB;
+  letter-spacing: 3px;
+  font-size: 40px;
+  width: 60px;
+  height: 50px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+
+
+
+.game-text {
+  letter-spacing: 1px;
+  font-size: 18px;
+  text-align: center;
+  margin: 0;
+}
+
+
+#time-holder {
+  display: flex;
+  margin-top: 5px;
+  justify-content: center;
+
+}
+
+#time-border {
+  background-color: whitesmoke;
+  border: 4px solid #294c74;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  display: flex;
+  justify-content: center;
+  height: 40px;
+  width: 200px;
+}
+
+.timer {
+  letter-spacing: 3px;
+  height: 30px;
+  width: 140px;
+  padding: 5px 0 0 10px;
+  margin: 0 auto;
+
+}
+
+
+
+#game-display {
+  background-color: white;
+  position: relative;
+  margin: 0 auto;
+  margin-top: -5px;
+  border: 4px solid #294c74;
+  ;
+
+}
 
 .block {
   position: absolute;
 }
 
-#user {
-  width: 100px;
-  height: 20px;
-  background-color: gold;
-
-}
-
 .player {
 
-  background-color: blueviolet;
+  background-color: #c0b9ab;
   position: absolute;
 }
 
 .ball {
 
   border-radius: 50%;
-  background-color: lightcoral;
+  background-color: #294c74;
   position: absolute;
+}
+
+
+
+
+
+#gameover-con {
+  margin-top: 20px;
+  background-image: url('/Assets/02\ Background/Background_Small.png');
+  background-size: cover;
+  text-align: center;
+
+}
+
+#gameover-con .logo-small {
+  width: 200px;
+  height: 60px;
+  margin: 0 auto;
+}
+
+#gameover {
+  font-size: 80px;
+  margin: 0 auto;
+  color: #f17633;
+  letter-spacing: 7px;
+  -webkit-text-stroke-width: 3px;
+  -webkit-text-stroke-color: #294c74;
+}
+
+#final-score {
+  justify-content: center;
+  margin: 20px auto
+}
+
+.your-score {
+  letter-spacing: 3px;
+  font-size: 25px;
+  margin: 0 30px 0 0
+}
+
+
+button {
+  font-family: coolvetica;
+  letter-spacing: 3px;
+  font-size: 30px;
+  color: #294c74;
+  height: 60px;
+  width: 180px;
+  border-radius: 10px;
+  border: 5px solid #294c74;
+  margin: 10px 10px 0 10px;
+  cursor: pointer;
+
+}
+
+button:hover {
+  background-color: #F17633;
+  color: white;
+}
+
+button:active {
+  background-color: #F17633;
+  transform: translateY(2px);
+}
+
+
+
+#final-score .score {
+  letter-spacing: 5px;
+  font-size: 60px;
+  width: 100px;
+  height: 80px;
+  margin: 0;
+
+}
+
+
+#menu-con {
+  margin-top: 20px;
+  background-image: url('/Assets/02\ Background/Background_Small.png');
+  background-size: cover;
+  text-align: center;
+}
+
+#menu-con .logo-small {
+  width: 500px;
+  height: 150px;
+  margin: 0 auto;
+}
+
+
+#menu-con .game-text {
+
+  font-size: 28px;
+  text-align: center;
+  margin: 10px 0 20px 0;
 }

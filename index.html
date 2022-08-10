@@ -11,12 +11,48 @@
 </head>
 
 <body>
-  <!-- <div id='menu'></div> -->
-  <div id="game">
-    <h3 id="score-display">Your Score: </h3>
-    <div id="game-display">
-    </div>
 
+  <div id="menu-con" class = 'artboard'>
+    <img class= 'logo-small' src= '/Assets/01 Logo/Logo_Small.png'>
+    <p class='game-text'>- Select your mode -</p>
+    <div>
+    <button>Easy</button>
+    <button>Normal</button>
+    <button>Hard</button>
+  </div>
+
+
+  </div>
+  <!-- <div id='menu'></div> -->
+  <div id="game" class = 'artboard'>
+    <div id='scoring-board'>
+      <img class='logo-small' src= '/Assets/01 Logo/Logo_Small.png'>
+      <div class="score-display">
+        <p class='score-title'>Score </p>
+      </div>
+    </div>
+    
+    <p class='game-text'>Next row dropping in </p>
+    <div id='time-holder'>
+      <div id='time-border'></div>
+    </div>
+    <div id="game-display"></div>
+  </div>
+
+
+  <div id= 'gameover-con' class = 'artboard'> 
+    <img class= 'logo-small' src= '/Assets/01 Logo/Logo_Small.png'>
+    <p id='gameover'>Game Over!</p>
+    <div id='final-score' class="score-display"> 
+      <div>
+      <p class='your-score'>Your</p>
+      <p class='your-score'>Score</p>
+      </div>
+    </div>
+    <div>
+    <button>Try again</button>
+    <button>Menu</button>
+    </div>
   </div>
 
 </body>

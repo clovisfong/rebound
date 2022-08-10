@@ -3,7 +3,7 @@ import $ from "jquery";
 
 
 const app = {
-  gameDisplay: [{ width: 680, height: 400 }],
+  gameDisplay: [{ width: 670, height: 400 }],
 
   blockCount: 18,
   blockStartPos: [{ xAxis: 10, yAxis: 10 }],
@@ -117,10 +117,10 @@ const createBlockInstances = () => {
 
 /// DRAW BLOCKS, BAR, BALL AND SCORE
 
-const red = Math.floor(Math.random() * 256)
-const blue = Math.floor(Math.random() * 256)
-const green = Math.floor(Math.random() * 256)
-const colorcode = `rgb(${red}, ${blue}, ${green})`
+// const red = Math.floor(Math.random() * 256)
+// const blue = Math.floor(Math.random() * 256)
+// const green = Math.floor(Math.random() * 256)
+// const colorcode = `rgb(${red}, ${blue}, ${green})`
 
 
 const drawBlocks = () => {
@@ -133,7 +133,7 @@ const drawBlocks = () => {
       left: block.topLeft[0] + 'px',
       top: block.topLeft[1] + 'px'
     })
-    $block.css('background-color', colorcode)
+    $block.css('background-color', '#F17633')
     $('#game-display').append($block)
   }
 }
@@ -166,8 +166,10 @@ const drawBall = () => {
 
 
 const drawScore = () => {
-  const $score = $('<span>').text(app.scoreTracker).attr('id', 'score')
-  $('#score-display').append($score)
+  const $score = $('<p>').text(app.scoreTracker).addClass('score')
+  $('.score-display').append($score)
+
+
 }
 
 
@@ -246,7 +248,6 @@ const ballGameOver = () => {
   if (app.ballCurrentPos[0].yAxis + app.ballDiameter[0] > app.gameDisplay[0].height) {
     clearInterval(ballTimer)
     clearInterval(stopClock)
-    app.scoreTracker = "Game Over"
   }
 
   ///////////////
@@ -316,8 +317,8 @@ const convertTime = () => {
 // DISPLAY TIME
 const displayTimer = () => {
   convertTime()
-  const $milliseconds = $('<h3>').text(`${app.timeConvert.minute} : ${app.timeConvert.secondsTimer} : ${app.timeConvert.milliseconds}`).addClass('timer')
-  $milliseconds.insertAfter('#score-display')
+  const $milliseconds = $('<h2>').text(`${app.timeConvert.minute} : ${app.timeConvert.secondsTimer} : ${app.timeConvert.milliseconds}`).addClass('timer')
+  $('#time-border').append($milliseconds)
 }
 
 // 
@@ -412,7 +413,7 @@ const ballTimer = setInterval(moveBall, 5)
 
 const render = () => {
   $('#game-display').empty()
-  $('#score').remove()
+  $('.score').remove()
   drawBlocks()
   drawUserBar()
   drawBall()
