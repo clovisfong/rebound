@@ -13,7 +13,7 @@ const app = {
   blocks: [],
 
 
-  barSpeed: { leftSpeed: 30, rightSpeed: 30 },
+  barSpeed: { leftSpeed: 40, rightSpeed: 40 },
   barDimensions: { width: 150, height: 20 },
   barCurrentPos: { xAxis: 0, yAxis: 0 },
   barMode: { easy: 150, normal: 120, hard: 100 },
@@ -24,6 +24,7 @@ const app = {
     x: 1,
     y: -1
   },
+  ballSpeed: 1,
 
   scoreTracker: 0,
 
@@ -97,7 +98,9 @@ class Block {
 
 const checkAndPushBlocksNextRow = () => {
 
-  if ((app.blockStartPos.xAxis + app.nextBlockPosition.xAxis + app.blockDimension.width + app.blockGap.side) > app.gameDisplay.width) {
+  if ((app.blockStartPos.xAxis + app.nextBlockPosition.xAxis +
+    app.blockDimension.width + app.blockGap.side) > app.gameDisplay.width) {
+
     app.nextBlockPosition.xAxis = 0
     app.nextBlockPosition.yAxis += 30
   }
@@ -186,10 +189,10 @@ const drawScore = () => {
 
 const changeDirection = () => {
 
-  app.ballDirection.x === 1 && app.ballDirection.y === -1 ? app.ballDirection.y = 1 :
-    app.ballDirection.x === 1 && app.ballDirection.y === 1 ? app.ballDirection.x = -1 :
-      app.ballDirection.x === -1 && app.ballDirection.y === 1 ? app.ballDirection.y = -1 :
-        app.ballDirection.x === -1 && app.ballDirection.y === -1 ? app.ballDirection.x = 1 : null
+  app.ballDirection.x === app.ballSpeed && app.ballDirection.y === -app.ballSpeed ? app.ballDirection.y = app.ballSpeed :
+    app.ballDirection.x === app.ballSpeed && app.ballDirection.y === app.ballSpeed ? app.ballDirection.x = -app.ballSpeed :
+      app.ballDirection.x === -app.ballSpeed && app.ballDirection.y === app.ballSpeed ? app.ballDirection.y = -app.ballSpeed :
+        app.ballDirection.x === -app.ballSpeed && app.ballDirection.y === -app.ballSpeed ? app.ballDirection.x = app.ballSpeed : null
 
 }
 
@@ -211,8 +214,8 @@ const hitBarBounceLeft = () => {
     app.ballCurrentPos.xAxis >= app.barCurrentPos.xAxis - app.ballDiameter / 2 &&
     app.ballCurrentPos.xAxis <= app.barCurrentPos.xAxis + app.barDimensions.width / 2) {
 
-    app.ballDirection.x = -1
-    app.ballDirection.y = -1
+    app.ballDirection.x = -app.ballSpeed
+    app.ballDirection.y = -app.ballSpeed
   }
 }
 
@@ -223,8 +226,8 @@ const hitBarBounceRight = () => {
     app.ballCurrentPos.xAxis > app.barCurrentPos.xAxis + app.barDimensions.width / 2 &&
     app.ballCurrentPos.xAxis + app.ballDiameter <= app.barCurrentPos.xAxis + app.barDimensions.width + app.ballDiameter / 2) {
 
-    app.ballDirection.x = 1
-    app.ballDirection.y = -1
+    app.ballDirection.x = app.ballSpeed
+    app.ballDirection.y = -app.ballSpeed
   }
 }
 
@@ -545,8 +548,8 @@ const proceedToGamePage = () => {
   createBlockInstances()
 
 
-  app.ballDirection.x = 1
-  app.ballDirection.y = -1
+  app.ballDirection.x = app.ballSpeed
+  app.ballDirection.y = -app.ballSpeed
   clearInterval(stopClock)
   clearInterval(ballTimer)
 
@@ -570,18 +573,21 @@ const proceedToGamePage = () => {
 // SELECT MODE
 const easyMode = () => {
   app.barDimensions.width = app.barMode.easy
+  app.ballSpeed = 1
   proceedToGamePage()
 }
 
 
 const normalMode = () => {
   app.barDimensions.width = app.barMode.normal
+  app.ballSpeed = 1.5
   proceedToGamePage()
 }
 
 
 const hardMode = () => {
   app.barDimensions.width = app.barMode.hard
+  app.ballSpeed = 1.8
   proceedToGamePage()
 }
 
@@ -613,72 +619,44 @@ main()
 
 
 
-// const countTime = () => {
-//   app.timer.milliseconds += 10
-//   if (app.timer.milliseconds === 1000) {
-//     app.timer.seconds++
-//     app.timer.milliseconds = 0
-//     // Put shift blocks condition here because condition is reviewed every 1 sec
-//     if (app.timer.seconds % 30 === 0) {
-//       shiftCurrentBlocksDown()
-//       createNewRows()
-//       blocksGameOver()
-//       render()
-//     }
-//   }
-//   if (app.timer.seconds === 60) {
-//     app.timer.minute++
-//     app.timer.seconds = 0
-//   }
-//   if (app.timer.minute === 60) {
-//     clearInterval(stopClock)
-//   }
-// }
 
 
-// const checkStartTime = () => {
-//   if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds >= 0 && app.timer.milliseconds >= 10) { //2.15.120 min or  2.00.990
-//     app.timeSwitch = false
-//   }
+const checkStartTime = () => {
+  if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds >= 0 && app.timer.milliseconds >= 10) { //2.15.120 min or  2.00.990
+    app.timeSwitch = false
+  }
 
-//   if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.milliseconds === 0) {
-//     if (app.timer.seconds > 0) { // 2.15.00 min
-//       app.timer.seconds--
-//     }
-//     if (app.timer.seconds === 0) { // 2.00.00 min
-//       app.timer.minute--
-//       app.timer.seconds += 59
-//     }
-//     app.timer.milliseconds += 1000
-//     app.timeSwitch = false
-//   }
+  if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.milliseconds === 0) {
+    if (app.timer.seconds > 0) { // 2.15.00 min
+      app.timer.seconds--
+    }
+    if (app.timer.seconds === 0) { // 2.00.00 min
+      app.timer.minute--
+      app.timer.seconds += 59
+    }
+    app.timer.milliseconds += 1000
+    app.timeSwitch = false
+  }
 
-//   if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds > 0 && app.timer.milliseconds === 0) { // 2.15.00 min
-//     app.timer.seconds--
-//     app.timer.milliseconds += 1000
-//     app.timeSwitch = false
-//   }
-//   if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) { // 2.00.00 min
-//     app.timer.minute--
-//     app.timer.seconds += 59
-//     app.timer.milliseconds += 1000
-//     app.timeSwitch = false
-//   }
-//   if (app.timeSwitch === true && app.timer.minute === 0 && app.timer.seconds > 0 && app.timer.milliseconds >= 10) { // 0.45.450
-//     app.timeSwitch = false
-//   }
-//   if (app.timeSwitch === true && app.timer.minute === 0 && app.timer.seconds > 0 && app.timer.milliseconds === 0) {// 0.45.0
-//     app.timer.seconds--
-//     app.timer.milliseconds += 1000
-//     app.timeSwitch = false
-//   }
-// }
+  if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds > 0 && app.timer.milliseconds === 0) { // 2.15.00 min
+    app.timer.seconds--
+    app.timer.milliseconds += 1000
+    app.timeSwitch = false
+  }
+  if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) { // 2.00.00 min
+    app.timer.minute--
+    app.timer.seconds += 59
+    app.timer.milliseconds += 1000
+    app.timeSwitch = false
+  }
+  if (app.timeSwitch === true && app.timer.minute === 0 && app.timer.seconds > 0 && app.timer.milliseconds >= 10) { // 0.45.450
+    app.timeSwitch = false
+  }
+  if (app.timeSwitch === true && app.timer.minute === 0 && app.timer.seconds > 0 && app.timer.milliseconds === 0) {// 0.45.0
+    app.timer.seconds--
+    app.timer.milliseconds += 1000
+    app.timeSwitch = false
+  }
+}
 
 
-// Put new blocks condition here because it is reviewed by the sec
-    // if (app.timer.seconds % 10 === 0) {
-    //   shiftCurrentBlocksDown()
-    //   createNewRows()
-    //   blocksGameOver()
-    //   render()
-    // }
