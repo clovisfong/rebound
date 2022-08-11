@@ -36,9 +36,6 @@ const app = {
   gameDisplaySwitch: false,
   endGameDisplaySwitch: false,
 
-  tballTimer: 10,
-  tmoveBall: 5,
-
 }
 
 
@@ -443,17 +440,17 @@ const runTime = () => {
 
 ///// INTERVAL SEGMENT WITH SWITCH
 
-const stopClock = setInterval(() => {
+let stopClock = setInterval(() => {
   if (app.gameSwitch === true) {
     runTime()
   }
-}, app.tballTimer)
+}, 10)
 
-const ballTimer = setInterval(() => {
+let ballTimer = setInterval(() => {
   if (app.gameSwitch === true) {
     moveBall()
   }
-}, app.tmoveBall)
+}, 5)
 
 
 
@@ -549,6 +546,24 @@ const proceedToGamePage = () => {
   setGameDisplay()
   createBlockInstances()
 
+
+  app.ballDirection.xDirection = 1
+  app.ballDirection.yDirection = -1
+  clearInterval(stopClock)
+  clearInterval(ballTimer)
+
+  stopClock = setInterval(() => {
+    if (app.gameSwitch === true) {
+      runTime()
+    }
+  }, 10)
+
+  ballTimer = setInterval(() => {
+    if (app.gameSwitch === true) {
+      moveBall()
+    }
+  }, 5)
+
   render()
 }
 
@@ -585,28 +600,9 @@ const hardMode = () => {
 }
 
 const reset = () => {
-  app.tballTimer = 0
-  app.moveBall = 0
   app.ballDirection.xDirection = 1
   app.ballDirection.yDirection = -1
-  clearInterval(runTime)
-  clearInterval(moveBall)
-  setInterval(() => {
-    if (app.gameSwitch === true) {
-      runTime()
-    }
-  }, 0)
-
-  setInterval(() => {
-    if (app.gameSwitch === true) {
-      moveBall()
-    }
-  }, 0)
-
-
   proceedToGamePage()
-
-
   render()
 
 }
