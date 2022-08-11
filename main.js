@@ -1,14 +1,14 @@
 import $ from "jquery";
 
 
-
+/// STORAGE SPACE
 const app = {
-  gameDisplay: [{ width: 670, height: 400 }],
+  gameDisplay: { width: 670, height: 400 },
 
   blockCount: 18,
-  blockStartPos: [{ xAxis: 10, yAxis: 10 }],
-  blockDimension: [{ width: 100, height: 20 }],
-  blockGap: [{ side: 10, bottom: 10 }],
+  blockStartPos: { xAxis: 10, yAxis: 10 },
+  blockDimension: { width: 100, height: 20 },
+  blockGap: { side: 10, bottom: 10 },
   nextBlockPosition: { xAxis: 0, yAxis: 0 },
   blocks: [],
 
@@ -18,17 +18,18 @@ const app = {
   barCurrentPos: { xAxis: 0, yAxis: 0 },
   barMode: { easy: 150, normal: 120, hard: 100 },
 
-  ballCurrentPos: [{ xAxis: 0, yAxis: 0 }],
-  ballDiameter: [30],
+  ballCurrentPos: { xAxis: 0, yAxis: 0 },
+  ballDiameter: 30,
   ballDirection: {
-    xDirection: 1,
-    yDirection: -1
+    x: 1,
+    y: -1
   },
 
   scoreTracker: 0,
 
-  timer: { milliseconds: 0, seconds: 0, minute: 2 },
+  timer: { milliseconds: 0, seconds: 10, minute: 0 },
   timeConvert: { milliseconds: 0, seconds: 0, minute: 0 },
+  timeAdd: 10,
 
   gameSwitch: false,
 
@@ -39,54 +40,37 @@ const app = {
 }
 
 
-/// SWITCH PAGES
-const selectArtboard = () => {
 
-  if (app.homeDisplaySwitch === true) {
-    $('#menu-con').show()
-    $('#game-con').hide()
-    $('#gameover-con').hide()
-  }
-  if (app.gameDisplaySwitch === true) {
-    $('#menu-con').hide()
-    $('#game-con').show()
-    $('#gameover-con').hide()
-  }
-  if (app.endGameDisplaySwitch === true) {
-    $('#menu-con').hide()
-    $('#game-con').hide()
-    $('#gameover-con').show()
-  }
 
-}
+/// CREATE GAME DISPLAY
+
+const setGameDisplay = () => $('#game-display').css({
+  width: app.gameDisplay.width + 'px',
+  height: app.gameDisplay.height + 'px',
+})
+
 
 
 
 /// CREATE BAR AND BALL COORDINATES IN RELATION TO GAME DISPLAY
 
-
-
 const barStartXPosition = () => {
-  const widthDifferenceOfBarAndDisplay = app.gameDisplay[0].width - app.barDimensions.width
-  const barXAxisCoordinate = widthDifferenceOfBarAndDisplay / 2
-  app.barCurrentPos.xAxis = barXAxisCoordinate
+  const widthDifference = app.gameDisplay.width - app.barDimensions.width
+  app.barCurrentPos.xAxis = widthDifference / 2
 }
 
 const barStartYPosition = () => {
-  const heightDifferenceOfBarAndDisplay = app.gameDisplay[0].height - app.barDimensions.height
-  const barYAxisCoordinate = heightDifferenceOfBarAndDisplay - app.blockStartPos[0].yAxis
-  app.barCurrentPos.yAxis = barYAxisCoordinate
+  const heightDifference = app.gameDisplay.height - app.barDimensions.height
+  app.barCurrentPos.yAxis = heightDifference - app.blockGap.bottom
 }
 
 const ballStartXPosition = () => {
-  const gameDisplayMidpoint = app.gameDisplay[0].width / 2
-  const ballXAxisCoordinate = gameDisplayMidpoint - app.ballDiameter / 2
-  app.ballCurrentPos[0].xAxis = ballXAxisCoordinate
+  const gameDisplayMidpoint = app.gameDisplay.width / 2
+  app.ballCurrentPos.xAxis = gameDisplayMidpoint - app.ballDiameter / 2
 }
 
 const ballStartYPosition = () => {
-  const ballYAxisCoordinate = app.barCurrentPos.yAxis - app.ballDiameter
-  app.ballCurrentPos[0].yAxis = ballYAxisCoordinate
+  app.ballCurrentPos.yAxis = app.barCurrentPos.yAxis - app.ballDiameter
 }
 
 const setBarAndBallCoordinates = () => {
@@ -100,65 +84,59 @@ const setBarAndBallCoordinates = () => {
 
 
 
-/// CREATE GAME DISPLAY
-
-const setGameDisplay = () => {
-
-  $('#game-display').css({
-    width: app.gameDisplay[0].width + 'px',
-    height: app.gameDisplay[0].height + 'px',
-  })
-}
-
-
-
-
-/// GENERATE BLOCKS DATA DYNAMICALLY
+/// GENERATE BLOCKS DATA
 
 class Block {
   constructor(xAxis, yAxis) {
     this.topLeft = [xAxis, yAxis]
-    this.topRight = [xAxis + app.blockDimension[0].width, yAxis]
-    this.btmLeft = [xAxis, yAxis + app.blockDimension[0].height]
-    this.btmRight = [xAxis + app.blockDimension[0].width, yAxis + app.blockDimension[0].height]
-
+    this.topRight = [xAxis + app.blockDimension.width, yAxis]
+    this.btmLeft = [xAxis, yAxis + app.blockDimension.height]
+    this.btmRight = [xAxis + app.blockDimension.width, yAxis + app.blockDimension.height]
   }
 }
 
+const checkAndPushBlocksNextRow = () => {
+
+  if ((app.blockStartPos.xAxis + app.nextBlockPosition.xAxis + app.blockDimension.width + app.blockGap.side) > app.gameDisplay.width) {
+    app.nextBlockPosition.xAxis = 0
+    app.nextBlockPosition.yAxis += 30
+  }
+}
+
+const createBlock = () => {
+  const block = new Block(
+    app.blockStartPos.xAxis + app.nextBlockPosition.xAxis,
+    app.blockStartPos.yAxis + app.nextBlockPosition.yAxis)
+
+  app.nextBlockPosition.xAxis += (app.blockDimension.width + app.blockGap.side)
+  checkAndPushBlocksNextRow()
+  app.blocks.push(block)
+
+}
 
 const createBlockInstances = () => {
+
   // For game reset game purpose
   app.nextBlockPosition.yAxis = 0
   app.blocks = []
   // Create data coordinates for all the blocks and store in app
   for (let i = 0; i < app.blockCount; i++) {
-    const block = new Block(
-      app.blockStartPos[0].xAxis + app.nextBlockPosition.xAxis,
-      app.blockStartPos[0].yAxis + app.nextBlockPosition.yAxis)
-
-    app.nextBlockPosition.xAxis += (app.blockDimension[0].width + app.blockGap[0].side)
-    if ((app.blockStartPos[0].xAxis + app.blockDimension[0].width + app.nextBlockPosition.xAxis) > app.gameDisplay[0].width) {
-      app.nextBlockPosition.xAxis = 0
-      app.nextBlockPosition.yAxis += 30
-    }
-    app.blocks.push(block)
+    createBlock()
   }
-
 }
 
 
 
 
 /// DRAW BLOCKS, BAR, BALL AND SCORE
-
-
 const drawBlocks = () => {
+
   //take block coordinates from app and display
   for (const block of app.blocks) {
     const $block = $('<div>').addClass('block')
     $block.css({
-      width: app.blockDimension[0].width + 'px',
-      height: app.blockDimension[0].height + 'px',
+      width: app.blockDimension.width + 'px',
+      height: app.blockDimension.height + 'px',
       left: block.topLeft[0] + 'px',
       top: block.topLeft[1] + 'px'
     })
@@ -185,10 +163,10 @@ const drawBall = () => {
 
   const $ball = $('<div>').addClass('ball')
   $ball.css({
-    width: app.ballDiameter[0] + 'px',
-    height: app.ballDiameter[0] + 'px',
-    left: app.ballCurrentPos[0].xAxis + 'px',
-    top: app.ballCurrentPos[0].yAxis + 'px'
+    width: app.ballDiameter + 'px',
+    height: app.ballDiameter + 'px',
+    left: app.ballCurrentPos.xAxis + 'px',
+    top: app.ballCurrentPos.yAxis + 'px'
   })
   $('#game-display').append($ball)
 }
@@ -203,27 +181,24 @@ const drawScore = () => {
 
 
 
+
 /// BALL MOVEMENT
 
 const changeDirection = () => {
 
-  if (app.ballDirection.xDirection === 1 && app.ballDirection.yDirection === -1) {
-    app.ballDirection.yDirection = 1
-  } else if (app.ballDirection.xDirection === 1 && app.ballDirection.yDirection === 1) {
-    app.ballDirection.xDirection = -1
-  } else if (app.ballDirection.xDirection === -1 && app.ballDirection.yDirection === 1) {
-    app.ballDirection.yDirection = -1
-  } else if (app.ballDirection.xDirection === -1 && app.ballDirection.yDirection === -1) {
-    app.ballDirection.xDirection = 1
-  }
+  app.ballDirection.x === 1 && app.ballDirection.y === -1 ? app.ballDirection.y = 1 :
+    app.ballDirection.x === 1 && app.ballDirection.y === 1 ? app.ballDirection.x = -1 :
+      app.ballDirection.x === -1 && app.ballDirection.y === 1 ? app.ballDirection.y = -1 :
+        app.ballDirection.x === -1 && app.ballDirection.y === -1 ? app.ballDirection.x = 1 : null
+
 }
 
 
 const bounceOffWalls = () => {
 
-  if (app.ballCurrentPos[0].xAxis + app.ballDiameter[0] >= app.gameDisplay[0].width ||
-    app.ballCurrentPos[0].yAxis <= 0 ||
-    app.ballCurrentPos[0].xAxis <= 0
+  if (app.ballCurrentPos.xAxis + app.ballDiameter >= app.gameDisplay.width ||
+    app.ballCurrentPos.yAxis <= 0 ||
+    app.ballCurrentPos.xAxis <= 0
   ) {
     changeDirection()
   }
@@ -232,22 +207,24 @@ const bounceOffWalls = () => {
 
 const hitBarBounceLeft = () => {
 
-  if (app.ballCurrentPos[0].yAxis + app.ballDiameter[0] === app.barCurrentPos.yAxis &&
-    app.ballCurrentPos[0].xAxis >= app.barCurrentPos.xAxis - app.ballDiameter[0] / 2 &&
-    app.ballCurrentPos[0].xAxis <= app.barCurrentPos.xAxis + app.barDimensions.width / 2) {
-    app.ballDirection.xDirection = -1
-    app.ballDirection.yDirection = -1
+  if (app.ballCurrentPos.yAxis + app.ballDiameter === app.barCurrentPos.yAxis &&
+    app.ballCurrentPos.xAxis >= app.barCurrentPos.xAxis - app.ballDiameter / 2 &&
+    app.ballCurrentPos.xAxis <= app.barCurrentPos.xAxis + app.barDimensions.width / 2) {
+
+    app.ballDirection.x = -1
+    app.ballDirection.y = -1
   }
 }
 
 
 const hitBarBounceRight = () => {
 
-  if (app.ballCurrentPos[0].yAxis + app.ballDiameter[0] === app.barCurrentPos.yAxis &&
-    app.ballCurrentPos[0].xAxis > app.barCurrentPos.xAxis + app.barDimensions.width / 2 &&
-    app.ballCurrentPos[0].xAxis + app.ballDiameter[0] <= app.barCurrentPos.xAxis + app.barDimensions.width + app.ballDiameter[0] / 2) {
-    app.ballDirection.xDirection = 1
-    app.ballDirection.yDirection = -1
+  if (app.ballCurrentPos.yAxis + app.ballDiameter === app.barCurrentPos.yAxis &&
+    app.ballCurrentPos.xAxis > app.barCurrentPos.xAxis + app.barDimensions.width / 2 &&
+    app.ballCurrentPos.xAxis + app.ballDiameter <= app.barCurrentPos.xAxis + app.barDimensions.width + app.ballDiameter / 2) {
+
+    app.ballDirection.x = 1
+    app.ballDirection.y = -1
   }
 }
 
@@ -257,13 +234,14 @@ const removeBlocksAndUpdateScore = (item) => {
   app.scoreTracker++
 }
 
+
 const bounceOffBlocks = () => {
   for (let i = 0; i < app.blocks.length; i++) {
     if (
-      (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) > app.blocks[i].btmLeft[0] &&
-      (app.ballCurrentPos[0].xAxis + (app.ballDiameter[0] / 2)) < app.blocks[i].btmRight[0] &&
-      (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) > app.blocks[i].topLeft[1] &&
-      (app.ballCurrentPos[0].yAxis + (app.ballDiameter[0] / 2)) < app.blocks[i].btmRight[1]
+      (app.ballCurrentPos.xAxis + (app.ballDiameter / 2)) > app.blocks[i].btmLeft[0] &&
+      (app.ballCurrentPos.xAxis + (app.ballDiameter / 2)) < app.blocks[i].btmRight[0] &&
+      (app.ballCurrentPos.yAxis + (app.ballDiameter / 2)) > app.blocks[i].topLeft[1] &&
+      (app.ballCurrentPos.yAxis + (app.ballDiameter / 2)) < app.blocks[i].btmRight[1]
     ) {
       removeBlocksAndUpdateScore(i)
       changeDirection()
@@ -274,7 +252,7 @@ const bounceOffBlocks = () => {
 
 const ballGameOver = () => {
 
-  if (app.ballCurrentPos[0].yAxis + app.ballDiameter[0] > app.gameDisplay[0].height) {
+  if (app.ballCurrentPos.yAxis + app.ballDiameter > app.gameDisplay.height) {
     clearInterval(ballTimer)
     clearInterval(stopClock)
     proceedToEndGamePage()
@@ -292,27 +270,31 @@ const ballTouch = () => {
 
 
 const moveBall = () => {
-  app.ballCurrentPos[0].xAxis += app.ballDirection.xDirection
-  app.ballCurrentPos[0].yAxis += app.ballDirection.yDirection
+  app.ballCurrentPos.xAxis += app.ballDirection.x
+  app.ballCurrentPos.yAxis += app.ballDirection.y
 
   ballTouch()
   render()
 }
 
 
+
 ///// STOP CLOCK
 
 // CONVERT TIME
+
 const convertMilliseconds = () => {
   if (app.timer.milliseconds >= 100) {
     app.timeConvert.milliseconds = app.timer.milliseconds / 10
   } else {
     app.timeConvert.milliseconds = app.timer.milliseconds
   }
+
   if (app.timer.milliseconds === 1000 || app.timer.milliseconds === 0) {
     app.timeConvert.milliseconds = '00'
   }
 }
+
 
 const convertSeconds = () => {
   if (app.timer.seconds < 10) {
@@ -320,46 +302,46 @@ const convertSeconds = () => {
   } else {
     app.timeConvert.secondsTimer = app.timer.seconds
   }
+
   if (app.timer.seconds === 60) {
     app.timeConvert.secondsTimer = '00'
   }
 }
 
+
 const convertMinute = () => {
-  if (app.timer.minute < 10) {
-    app.timeConvert.minute = '0' + app.timer.minute
-  } else {
+  app.timer.minute < 10 ? app.timeConvert.minute = '0' + app.timer.minute :
     app.timeConvert.minute = app.timer.minute
-  }
 }
 
-
-const convertTime = () => {
-  convertMilliseconds()
-  convertSeconds()
-  convertMinute()
-
-}
 
 
 // DISPLAY TIME
-const displayTimer = () => {
-  convertTime()
+
+const drawTimer = () => {
+  convertMilliseconds()
+  convertSeconds()
+  convertMinute()
   const $time = $('<h2>').text(`${app.timeConvert.minute} : ${app.timeConvert.secondsTimer} : ${app.timeConvert.milliseconds}`).addClass('timer')
   $('#time-border').append($time)
 }
 
+
+
 // STOP TIME
-const stopTimerOnceZero = () => {
-  if (app.timer.minute === 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) {
-    clearInterval(stopClock)
-    clearInterval(moveBall)
-    proceedToEndGamePage()
-  }
+
+const addTimeAndRow = () => {
+  shiftCurrentBlocksDown()
+  createNewRow()
+  blocksGameOver()
+  app.timer.seconds = app.timeAdd
+  render()
+
 }
 
+
 const blocksGameOver = () => {
-  if (app.blocks.some((block) => block.btmLeft[1] > app.barCurrentPos.yAxis - app.ballDiameter[0])) {
+  if (app.blocks.some((block) => block.btmLeft[1] > app.barCurrentPos.yAxis - app.ballDiameter)) {
     clearInterval(stopClock)
     clearInterval(ballTimer)
     proceedToEndGamePage()
@@ -367,10 +349,11 @@ const blocksGameOver = () => {
 }
 
 
+
 // PROCDUCE NEW BLOCKS AND SHRINK BAR EVERY TIME INTERVAL
 
 const shiftCurrentBlocksDown = () => {
-  // Go to app directly to update coodinates for the old blocks
+  // Update coodinates for the old blocks directly at app
   app.blocks.forEach((block) => {
     block.topLeft[1] += 30;
     block.topRight[1] += 30;
@@ -379,66 +362,60 @@ const shiftCurrentBlocksDown = () => {
   })
 }
 
-const createNewRows = () => {
+
+const createNewRow = () => {
+  // reset 
   app.nextBlockPosition.xAxis = 0
   app.nextBlockPosition.yAxis = 0
-  for (let i = 0; i < Math.floor(app.gameDisplay[0].width / (app.blockDimension[0].width + app.blockGap[0].side)); i++) {
 
-    const newblock = new Block(
-      app.blockStartPos[0].xAxis + app.nextBlockPosition.xAxis,
-      app.blockStartPos[0].yAxis + app.nextBlockPosition.yAxis)
-
-    app.nextBlockPosition.xAxis += (app.blockDimension[0].width + app.blockGap[0].side)
-    if ((app.blockStartPos[0].xAxis + app.blockDimension[0].width + app.nextBlockPosition.xAxis) > app.gameDisplay[0].width) {
-      app.nextBlockPosition.xAxis = 0
-      app.nextBlockPosition.yAxis += 30
-    }
-    app.blocks.push(newblock)
+  for (let i = 0; i < Math.floor(app.gameDisplay.width / (app.blockDimension.width + app.blockGap.side)); i++) {
+    createBlock()
   }
 }
 
 
-const shrinkBar = () => {
-  if (app.barDimensions.width > 50) {
-    app.barDimensions.width -= 2
-  }
-}
+const shrinkBar = () => app.barDimensions.width > 50 ? app.barDimensions.width -= 2 : null
+
 
 
 
 // CALCULATE TIME
 
 const runTime = () => {
-  stopTimerOnceZero()
 
+
+  // convert min to sec
   if (app.timer.minute > 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) {
     app.timer.minute--
     app.timer.seconds = 60
   }
 
+  // convert sec to milliseconds
   if (app.timer.seconds > 0 && app.timer.milliseconds === 0) {
     app.timer.seconds--
     app.timer.milliseconds = 1000
-    // Put shift blocks condition here because condition is reviewed every 1 sec
-    if (app.timer.seconds % 3 === 0) {
-      shiftCurrentBlocksDown()
-      createNewRows()
-      blocksGameOver()
-      render()
-    }
+    //Put new blocks condition here so that it is reviewed by the sec
     if (app.timer.seconds % 2 === 0) {
       shrinkBar()
     }
-
   }
+
+  // check if time is 0 or milliseconds is 0
   if (app.timer.milliseconds > 0) { // important condition to determine the start and stop of timer
     app.timer.milliseconds -= 10
+  }
+
+  if (app.timer.minute === 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) {
+    addTimeAndRow()
   }
 
   render()
 }
 
-///// INTERVAL SEGMENT WITH SWITCH
+
+
+
+///// CENTRALISED TIMER AND BALL SWITCH
 
 let stopClock = setInterval(() => {
   if (app.gameSwitch === true) {
@@ -455,23 +432,20 @@ let ballTimer = setInterval(() => {
 
 
 
-
-
-
-
 const render = () => {
   $('#game-display').empty()
   $('.score').remove()
+  $('.timer').remove()
+
   drawBlocks()
   drawUserBar()
   drawBall()
   drawScore()
-  selectArtboard()
-
-  $('.timer').remove()
-  displayTimer()
+  switchArtboard()
+  drawTimer()
 
 }
+
 
 
 
@@ -498,19 +472,19 @@ const moveBarLeft = () => {
   if (app.barCurrentPos.xAxis < app.barSpeed.leftSpeed && app.barCurrentPos.xAxis > 0) {
     app.barCurrentPos.xAxis -= app.barCurrentPos.xAxis
   }
-
-
 }
+
 
 const moveBarRight = () => {
-  if (app.barCurrentPos.xAxis + app.barDimensions.width + app.barSpeed.rightSpeed <= app.gameDisplay[0].width) {
+  if (app.barCurrentPos.xAxis + app.barDimensions.width + app.barSpeed.rightSpeed <= app.gameDisplay.width) {
     app.barCurrentPos.xAxis += app.barSpeed.rightSpeed
   }
-  if ((app.gameDisplay[0].width - (app.barCurrentPos.xAxis + app.barDimensions.width)) < app.barSpeed.rightSpeed &&
-    app.barCurrentPos.xAxis < app.gameDisplay[0].width) {
-    app.barCurrentPos.xAxis += (app.gameDisplay[0].width - (app.barCurrentPos.xAxis + app.barDimensions.width))
+  if ((app.gameDisplay.width - (app.barCurrentPos.xAxis + app.barDimensions.width)) < app.barSpeed.rightSpeed &&
+    app.barCurrentPos.xAxis < app.gameDisplay.width) {
+    app.barCurrentPos.xAxis += (app.gameDisplay.width - (app.barCurrentPos.xAxis + app.barDimensions.width))
   }
 }
+
 
 const moveUserBar = (e) => {
   switch (e.which) {
@@ -524,11 +498,35 @@ const moveUserBar = (e) => {
       moveBarRight()
       break;
   }
-
   render()
 }
 
 
+
+
+/// SWITCH PAGES
+
+const switchArtboard = () => {
+  app.homeDisplaySwitch === true ? $('#menu-con').show() : $('#menu-con').hide()
+  app.gameDisplaySwitch === true ? $('#game-con').show() : $('#game-con').hide()
+  app.endGameDisplaySwitch === true ? $('#gameover-con').show() : $('#gameover-con').hide()
+}
+
+
+const proceedToHomePage = () => {
+  app.endGameDisplaySwitch = false
+  app.homeDisplaySwitch = true
+  app.gameDisplaySwitch = false
+  render()
+}
+
+
+const proceedToEndGamePage = () => {
+  app.gameDisplaySwitch = false
+  app.endGameDisplaySwitch = true
+  app.homeDisplaySwitch = false
+  render()
+}
 
 
 const proceedToGamePage = () => {
@@ -538,17 +536,17 @@ const proceedToGamePage = () => {
 
   app.scoreTracker = 0
   app.timer.milliseconds = 0
-  app.timer.seconds = 0
-  app.timer.minute = 2
+  app.timer.seconds = app.timeAdd
+  app.timer.minute = 0
   app.gameSwitch = false
 
-  setBarAndBallCoordinates()
   setGameDisplay()
+  setBarAndBallCoordinates()
   createBlockInstances()
 
 
-  app.ballDirection.xDirection = 1
-  app.ballDirection.yDirection = -1
+  app.ballDirection.x = 1
+  app.ballDirection.y = -1
   clearInterval(stopClock)
   clearInterval(ballTimer)
 
@@ -567,50 +565,32 @@ const proceedToGamePage = () => {
   render()
 }
 
-const proceedToEndGamePage = () => {
-  app.gameDisplaySwitch = false
-  app.endGameDisplaySwitch = true
-  app.homeDisplaySwitch = false
-  render()
-}
-
-const proceedToHomePage = () => {
-  app.endGameDisplaySwitch = false
-  app.homeDisplaySwitch = true
-  app.gameDisplaySwitch = false
-  render()
-}
 
 
+// SELECT MODE
 const easyMode = () => {
   app.barDimensions.width = app.barMode.easy
   proceedToGamePage()
-
 }
+
 
 const normalMode = () => {
   app.barDimensions.width = app.barMode.normal
   proceedToGamePage()
 }
 
+
 const hardMode = () => {
   app.barDimensions.width = app.barMode.hard
   proceedToGamePage()
-
 }
 
-const reset = () => {
-  app.ballDirection.xDirection = 1
-  app.ballDirection.yDirection = -1
-  proceedToGamePage()
-  render()
 
-}
+
 
 /// MAIN SWTICH 
 
 const main = () => {
-
 
   $('body').on('keydown', startGame)
   $('body').on('keydown', moveUserBar)
@@ -619,12 +599,11 @@ const main = () => {
   $('#normal').on('click', normalMode)
   $('#hard').on('click', hardMode)
 
-  $('#home').on('click', proceedToHomePage) //reset stuff
-  $('#try-again').on('click', reset) // reset stuff
+  $('#home').on('click', proceedToHomePage)
+  $('#try-again').on('click', proceedToGamePage)
 
 
   render()
-
 }
 
 
@@ -694,3 +673,12 @@ main()
 //     app.timeSwitch = false
 //   }
 // }
+
+
+// Put new blocks condition here because it is reviewed by the sec
+    // if (app.timer.seconds % 10 === 0) {
+    //   shiftCurrentBlocksDown()
+    //   createNewRows()
+    //   blocksGameOver()
+    //   render()
+    // }
