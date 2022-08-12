@@ -208,25 +208,28 @@ const bounceOffWalls = () => {
   }
 }
 
-const hitBarBounceLeft = () => {
+const bounceBallDiagonallyRight = () => {
+  if (app.ballDirection.x === app.ballSpeed && app.ballDirection.y === app.ballSpeed) {
+    app.ballDirection.x = app.ballSpeed
+    app.ballDirection.y = -app.ballSpeed
+  }
+}
 
-  if (app.ballCurrentPos.yAxis + app.ballDiameter === app.barCurrentPos.yAxis &&
-    app.ballCurrentPos.xAxis >= app.barCurrentPos.xAxis - app.ballDiameter / 2 &&
-    app.ballCurrentPos.xAxis <= app.barCurrentPos.xAxis + app.barDimensions.width / 2) {
-
+const bounceBallDiagonallyLeft = () => {
+  if (app.ballDirection.x === -app.ballSpeed && app.ballDirection.y === app.ballSpeed) {
     app.ballDirection.x = -app.ballSpeed
     app.ballDirection.y = -app.ballSpeed
   }
 }
 
-const hitBarBounceRight = () => {
+const bounceOffBar = () => {
 
   if (app.ballCurrentPos.yAxis + app.ballDiameter === app.barCurrentPos.yAxis &&
-    app.ballCurrentPos.xAxis > app.barCurrentPos.xAxis + app.barDimensions.width / 2 &&
+    app.ballCurrentPos.xAxis >= app.barCurrentPos.xAxis - app.ballDiameter / 2 &&
     app.ballCurrentPos.xAxis + app.ballDiameter <= app.barCurrentPos.xAxis + app.barDimensions.width + app.ballDiameter / 2) {
 
-    app.ballDirection.x = app.ballSpeed
-    app.ballDirection.y = -app.ballSpeed
+    bounceBallDiagonallyRight()
+    bounceBallDiagonallyLeft()
   }
 }
 
@@ -270,8 +273,7 @@ const ballGameOver = () => {
 
 const ballTouch = () => {
   bounceOffWalls()
-  hitBarBounceLeft()
-  hitBarBounceRight()
+  bounceOffBar()
   bounceOffBlocks()
   ballGameOver()
 }
