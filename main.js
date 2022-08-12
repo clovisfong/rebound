@@ -102,7 +102,7 @@ const checkAndPushBlocksNextRow = () => {
     app.blockDimension.width + app.blockGap.side) > app.gameDisplay.width) {
 
     app.nextBlockPosition.xAxis = 0
-    app.nextBlockPosition.yAxis += 30
+    app.nextBlockPosition.yAxis += (app.blockDimension.height + app.blockGap.bottom)
   }
 }
 
@@ -616,47 +616,5 @@ const main = () => {
 
 main()
 
-
-
-
-
-
-const checkStartTime = () => {
-  if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds >= 0 && app.timer.milliseconds >= 10) { //2.15.120 min or  2.00.990
-    app.timeSwitch = false
-  }
-
-  if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.milliseconds === 0) {
-    if (app.timer.seconds > 0) { // 2.15.00 min
-      app.timer.seconds--
-    }
-    if (app.timer.seconds === 0) { // 2.00.00 min
-      app.timer.minute--
-      app.timer.seconds += 59
-    }
-    app.timer.milliseconds += 1000
-    app.timeSwitch = false
-  }
-
-  if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds > 0 && app.timer.milliseconds === 0) { // 2.15.00 min
-    app.timer.seconds--
-    app.timer.milliseconds += 1000
-    app.timeSwitch = false
-  }
-  if (app.timeSwitch === true && app.timer.minute > 0 && app.timer.seconds === 0 && app.timer.milliseconds === 0) { // 2.00.00 min
-    app.timer.minute--
-    app.timer.seconds += 59
-    app.timer.milliseconds += 1000
-    app.timeSwitch = false
-  }
-  if (app.timeSwitch === true && app.timer.minute === 0 && app.timer.seconds > 0 && app.timer.milliseconds >= 10) { // 0.45.450
-    app.timeSwitch = false
-  }
-  if (app.timeSwitch === true && app.timer.minute === 0 && app.timer.seconds > 0 && app.timer.milliseconds === 0) {// 0.45.0
-    app.timer.seconds--
-    app.timer.milliseconds += 1000
-    app.timeSwitch = false
-  }
-}
 
 
