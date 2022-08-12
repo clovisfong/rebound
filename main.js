@@ -577,7 +577,7 @@ const easyMode = () => {
 const normalMode = () => {
   app.gameMode = 'N'
   app.barDimensions.width = app.barMode.normal
-  app.ballSpeed = 1.5
+  app.ballSpeed = 1.3
   proceedToGamePage()
 }
 
@@ -585,7 +585,7 @@ const normalMode = () => {
 const hardMode = () => {
   app.gameMode = 'H'
   app.barDimensions.width = app.barMode.hard
-  app.ballSpeed = 1.8
+  app.ballSpeed = 1.6
   proceedToGamePage()
 }
 
