@@ -51,7 +51,6 @@ body {
   letter-spacing: 3px;
   font-size: 25px;
   margin-right: 10px;
-
 }
 
 .score {
@@ -79,7 +78,6 @@ body {
   display: flex;
   margin-top: 5px;
   justify-content: center;
-
 }
 
 #time-border {
@@ -109,8 +107,6 @@ body {
   margin: 0 auto;
   margin-top: -5px;
   border: 4px solid #294c74;
-  ;
-
 }
 
 .block {
@@ -139,7 +135,6 @@ body {
   background-image: url('/Assets/02\ Background/Background_Small.png');
   background-size: cover;
   text-align: center;
-
 }
 
 #gameover-con .logo-small {
@@ -180,7 +175,6 @@ button {
   border: 5px solid #294c74;
   margin: 10px 10px 0 10px;
   cursor: pointer;
-
 }
 
 button:hover {
@@ -201,24 +195,23 @@ button:active {
   width: 100px;
   height: 80px;
   margin: 0;
-
 }
 
 
-#menu-con {
+#home-con {
   background-image: url('/Assets/02\ Background/Background_Small.png');
   background-size: cover;
   text-align: center;
 }
 
-#menu-con .logo-small {
+#home-con .logo-small {
   width: 500px;
   height: 150px;
   margin: 0 auto;
 }
 
 
-#menu-con .game-text {
+#home-con .game-text {
 
   font-size: 28px;
   text-align: center;
