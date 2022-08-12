@@ -32,13 +32,14 @@ const app = {
   timeConvert: { milliseconds: 0, seconds: 0, minute: 0 },
   timeAdd: 10,
 
+  gameMode: "",
   gameSwitch: false,
-
   homeDisplaySwitch: true,
   gameDisplaySwitch: false,
   endGameDisplaySwitch: false,
 
 }
+
 
 
 
@@ -238,19 +239,41 @@ const removeBlocksAndUpdateScore = (item) => {
 }
 
 
+const checkOverlap = (R, Xc, Yc, X1, Y1, X2, Y2) => {
+  let Xn = Math.max(X1, Math.min(Xc, X2));
+  let Yn = Math.max(Y1, Math.min(Yc, Y2));
+
+  let Dx = Xn - Xc;
+  let Dy = Yn - Yc;
+  return (Dx * Dx + Dy * Dy) <= R * R;
+}
+
 const bounceOffBlocks = () => {
   for (let i = 0; i < app.blocks.length; i++) {
-    if (
-      (app.ballCurrentPos.xAxis + (app.ballDiameter / 2)) > app.blocks[i].btmLeft[0] &&
-      (app.ballCurrentPos.xAxis + (app.ballDiameter / 2)) < app.blocks[i].btmRight[0] &&
-      (app.ballCurrentPos.yAxis + (app.ballDiameter / 2)) > app.blocks[i].topLeft[1] &&
-      (app.ballCurrentPos.yAxis + (app.ballDiameter / 2)) < app.blocks[i].btmRight[1]
-    ) {
+    if (checkOverlap(app.ballDiameter / 2,
+      (app.ballCurrentPos.xAxis + app.ballDiameter / 2), (app.ballCurrentPos.yAxis + app.ballDiameter / 2),
+      app.blocks[i].btmLeft[0], app.blocks[i].btmLeft[1],
+      app.blocks[i].topRight[0], app.blocks[i].topRight[1])) {
       removeBlocksAndUpdateScore(i)
       changeDirection()
     }
   }
 }
+
+
+// const bounceOffBlocks = () => {
+//   for (let i = 0; i < app.blocks.length; i++) {
+//     if (
+//       (app.ballCurrentPos.xAxis + (app.ballDiameter / 2)) > app.blocks[i].btmLeft[0] &&
+//       (app.ballCurrentPos.xAxis + (app.ballDiameter / 2)) < app.blocks[i].btmRight[0] &&
+//       (app.ballCurrentPos.yAxis + (app.ballDiameter / 2)) > app.blocks[i].topLeft[1] &&
+//       (app.ballCurrentPos.yAxis + (app.ballDiameter / 2)) < app.blocks[i].btmRight[1]
+//     ) {
+//       removeBlocksAndUpdateScore(i)
+//       changeDirection()
+//     }
+//   }
+// }
 
 
 const ballGameOver = () => {
@@ -543,6 +566,15 @@ const proceedToGamePage = () => {
   app.timer.minute = 0
   app.gameSwitch = false
 
+  if (app.gameMode === 'E') {
+    app.barDimensions.width = app.barMode.easy
+  } else if (app.gameMode === 'N') {
+    app.barDimensions.width = app.barMode.normal
+  } else if (app.gameMode === 'H') {
+    app.barDimensions.width = app.barMode.hard
+  }
+
+
   setGameDisplay()
   setBarAndBallCoordinates()
   createBlockInstances()
@@ -572,6 +604,7 @@ const proceedToGamePage = () => {
 
 // SELECT MODE
 const easyMode = () => {
+  app.gameMode = 'E'
   app.barDimensions.width = app.barMode.easy
   app.ballSpeed = 1
   proceedToGamePage()
@@ -579,6 +612,7 @@ const easyMode = () => {
 
 
 const normalMode = () => {
+  app.gameMode = 'N'
   app.barDimensions.width = app.barMode.normal
   app.ballSpeed = 1.5
   proceedToGamePage()
@@ -586,6 +620,7 @@ const normalMode = () => {
 
 
 const hardMode = () => {
+  app.gameMode = 'H'
   app.barDimensions.width = app.barMode.hard
   app.ballSpeed = 1.8
   proceedToGamePage()
