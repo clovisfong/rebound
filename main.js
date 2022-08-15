@@ -23,15 +23,13 @@ const app = {
 
   ballCurrentPos: { xAxis: 0, yAxis: 0 },
   ballDiameter: 30,
-  ballDirection: {
-    x: 1,
-    y: -1
-  },
+  ballDirection: { x: 1, y: -1 },
   ballSpeed: 1,
+  ballSpeedMode: { easy: 1, normal: 1.3, hard: 1.6 },
 
   scoreTracker: 0,
 
-  timer: { milliseconds: 0, seconds: 10, minute: 0 },
+  timer: { milliseconds: 0, seconds: 0, minute: 0 },
   timeConvert: { milliseconds: 0, seconds: 0, minute: 0 },
   timeAdd: 10,
 
@@ -569,7 +567,7 @@ SELECT MODE
 const easyMode = () => {
   app.gameMode = 'E'
   app.barDimensions.width = app.barMode.easy
-  app.ballSpeed = 1
+  app.ballSpeed = app.ballSpeedMode.easy
   proceedToGamePage()
 }
 
@@ -577,7 +575,7 @@ const easyMode = () => {
 const normalMode = () => {
   app.gameMode = 'N'
   app.barDimensions.width = app.barMode.normal
-  app.ballSpeed = 1.3
+  app.ballSpeed = app.ballSpeedMode.normal
   proceedToGamePage()
 }
 
@@ -585,7 +583,7 @@ const normalMode = () => {
 const hardMode = () => {
   app.gameMode = 'H'
   app.barDimensions.width = app.barMode.hard
-  app.ballSpeed = 1.6
+  app.ballSpeed = app.ballSpeedMode.hard
   proceedToGamePage()
 }
 
